@@ -1,0 +1,4 @@
+flask
+werkzeug
+requests
+python-dotenv
