@@ -12,7 +12,6 @@
 - [Project Overview](#project-overview)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
-- [Installation](#installation)
   - [Prerequisites](#prerequisites)
   - [Local Setup](#local-setup)
 - [Configuration](#configuration)
@@ -21,11 +20,6 @@
   - [User Workflow](#user-workflow)
 - [Database Management](#database-management)
 - [AI Integration](#ai-integration)
-- [Deployment](#deployment)
-  - [Deploying to PythonAnywhere](#deploying-to-pythonanywhere)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
 - [Acknowledgements](#acknowledgements)
 
 ## Project Overview
@@ -57,8 +51,6 @@ This project is built with security and usability in mind, using SQLite for pers
 - **Environment Management**: python-dotenv (for loading `.env` files)
 - **Frontend**: Jinja2 templates (HTML/CSS/JS – assumes basic Bootstrap or similar in templates)
 - **Other**: JSON for data handling, re for regex validations
-
-## Installation
 
 ### Prerequisites
 
