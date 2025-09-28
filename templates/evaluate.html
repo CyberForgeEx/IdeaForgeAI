@@ -1,0 +1,23 @@
+<!-- evaluate.html -->
+{% extends "base.html" %}
+
+{% block title %}Evaluate Idea{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Evaluate New Idea</h1>
+<div class="card">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('evaluate') }}">
+            <div class="mb-3">
+                <label for="title" class="form-label">Idea Title</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="idea_description" class="form-label">Idea Description</label>
+                <textarea class="form-control" id="idea_description" name="idea_description" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Evaluate with AI</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

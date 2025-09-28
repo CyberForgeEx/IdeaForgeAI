@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}POML for Idea: {{ idea.title }}{% endblock %}
+
+{% block content %}
+<!-- Tailwind CSS CDN for styling (include only if not in base.html) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    /* Custom styles for the modal and textarea */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    .modal-content {
+        background-color: white;
+        color: black;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    textarea#poml-content {
+        background-color: #f6f8fa;
+        color: black;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 10px;
+        font-family: monospace;
+        resize: none; /* Prevent manual resizing, rely on CSS */
+        width: 100%;
+        min-height: 300px;
+        overflow-y: auto;
+    }
+    @media (max-width: 640px) {
+        textarea#poml-content {
+            min-height: 200px;
+        }
+    }
+</style>
+
+<div class="container mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-4">POML for Idea: {{ idea.title }}</h1>
+    
+    <div class="mb-4">
+        <a href="{{ url_for('view_idea', idea_id=idea.id) }}" class="text-blue-600 hover:underline">Back to Idea</a>
+        | <a href="{{ url_for('dashboard') }}" class="text-blue-600 hover:underline">Back to Dashboard</a>
+    </div>
+
+    {% if pretty_poml %}
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold mb-2 text-black bg-white">POML Data</h2>
+            <textarea id="poml-content" readonly>{{ pretty_poml }}</textarea>
+            <button id="copy-btn" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none">
+                Copy POML to Clipboard
+            </button>
+        </div>
+    {% else %}
+        <p class="text-red-600">No POML data available for this idea.</p>
+    {% endif %}
+</div>
+
+<!-- Modal for copy confirmation and instructions -->
+<div id="copy-modal" class="modal">
+    <div class="modal-content">
+        <h3 class="text-xl font-bold mb-2">POML Copied Successfully!</h3>
+        <p class="mb-4">The POML data has been copied to your clipboard.</p>
+        <h4 class="text-lg font-semibold mb-2">How to Use POML</h4>
+        <ul class="list-disc pl-5 mb-4">
+            <li>POML (Prompt Orchestration Markup Language) is a JSON-based format that defines a logical flow for building your software application using AI-driven prompts.</li>
+            <li><strong>Parse the JSON</strong>: Use the copied JSON in a prompt orchestration system or development tool that supports structured workflows.</li>
+            <li><strong>Use the Prompts</strong>: The POML includes example prompts for key tasks (e.g., code generation, testing). Feed these prompts to an AI model like Grok or another API.</li>
+            <li><strong>Integrate with Tools</strong>: Import the POML into tools that support AI-driven development to automate tasks or generate code.</li>
+            <li><strong>Validate the Structure</strong>: Ensure the JSON is valid and compatible with your target system before use.</li>
+            <li><strong>Example Workflow</strong>: Load the POML into a script or platform, execute the prompts in sequence, and review the outputs for your project.</li>
+        </ul>
+        <button id="close-modal" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 focus:outline-none">Close</button>
+    </div>
+</div>
+
+<script>
+    document.getElementById('copy-btn').addEventListener('click', async () => {
+        const pomlContent = document.getElementById('poml-content').value;
+        try {
+            await navigator.clipboard.writeText(pomlContent);
+            const modal = document.getElementById('copy-modal');
+            modal.style.display = 'flex';
+        } catch (err) {
+            console.error('Failed to copy: ', err);
+            alert('Failed to copy POML data. Please try again.');
+        }
+    });
+
+    document.getElementById('close-modal').addEventListener('click', () => {
+        const modal = document.getElementById('copy-modal');
+        modal.style.display = 'none';
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('copy-modal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('copy-modal')) {
+            document.getElementById('copy-modal').style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,65 @@
+<!-- dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Welcome, {{ user.username }}!</h1>
+
+{% if stats.total_ideas == 0 %}
+<p>You haven't evaluated any ideas yet. <a href="{{ url_for('evaluate') }}">Start now!</a></p>
+{% else %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Total Ideas</h5>
+                <p class="card-text display-4">{{ stats.total_ideas }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Average Score</h5>
+                <p class="card-text display-4">{{ stats.avg_score | round(1) }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Best Score</h5>
+                <p class="card-text display-4">{{ stats.best_score }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<h2 class="mb-3">Recent Ideas</h2>
+{% if recent_ideas %}
+<table class="table table-dark table-hover">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Score</th>
+            <th>Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for idea in recent_ideas %}
+        <tr>
+            <td>{{ idea.title }}</td>
+            <td>{{ idea.overall_score | round(1) }}</td>
+            <td>{{ idea.created_at }}</td>
+            <td><a href="{{ url_for('view_idea', idea_id=idea.id) }}" class="btn btn-sm btn-outline-primary">View</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No recent ideas. <a href="{{ url_for('evaluate') }}">Evaluate a new one!</a></p>
+{% endif %}
+{% endblock %}
