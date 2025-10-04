@@ -1,11 +1,7 @@
-# IdeaForge: AI-Powered Software Idea Evaluator
-
-![IdeaForge Logo](https://via.placeholder.com/150x50?text=IdeaForge) <!-- Replace with actual logo if available -->
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
-[![Flask Version](https://img.shields.io/badge/Flask-3.0%2B-green)](https://flask.palletsprojects.com/)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)](https://example.com/build) <!-- Update with actual CI/CD badge if set up -->
+<h2 align="center">
+  IdeaForge: AI-Powered Software Idea Evaluator
+  <img src="./assets/logo.png" alt="project logo">
+</h2>
 
 ## Table of Contents
 
@@ -13,7 +9,6 @@
 - [Features](#features)
 - [Tech Stack](#tech-stack)
   - [Prerequisites](#prerequisites)
-  - [Local Setup](#local-setup)
 - [Configuration](#configuration)
 - [Usage](#usage)
   - [Running the Application](#running-the-application)
