@@ -77,12 +77,30 @@ init_database()
 # API Configuration
 OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY')
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
-MODEL = "x-ai/grok-4-fast:free"
+MODEL = "nvidia/nemotron-nano-9b-v2:free"
 
 HEADERS = {
     "Authorization": f"Bearer {OPENROUTER_API_KEY}",
     "Content-Type": "application/json"
 }
+
+# Helper function to extract JSON
+def extract_json_from_response(text):
+    """Extract JSON from response """
+    text = text.strip()
+
+    # MD code block remove.
+    if text.startswith('```json'):
+        text = text[7:]
+        if text.endswith('```'):
+            text = text[:-3]
+    elif text.startswith('```'):
+        text = text[3:]
+        if text.endswith('```'):
+            text = text[:-3]
+
+    return text.strip()
+    
 
 # Idea Validation
 def validate_idea_content(title, description):
@@ -245,11 +263,8 @@ Description: {description}
         response_data = response.json()
         ai_message = response_data['choices'][0]['message']['content'].strip()
         
-        # Extract JSON from response
-        if ai_message.startswith('```json```'):
-            ai_message = ai_message.strip('```json```')
-        elif ai_message.startswith('```'):
-            ai_message = ai_message.strip('```').strip()
+        # Extract JSON from response from helper
+        ai_message = extract_json_from_response(ai_message)    
         
         validation_result = json.loads(ai_message)
         
@@ -465,11 +480,8 @@ def evaluate_idea_with_ai(idea_description):
         response_data = response.json()
         ai_message = response_data['choices'][0]['message']['content'].strip()
         
-        # Extract JSON from response
-        if ai_message.startswith('```json```'):
-            ai_message = ai_message.strip('```json```')
-        elif ai_message.startswith('```'):
-            ai_message = ai_message.strip('```').strip()
+        # Extract JSON
+        ai_message = extract_json_from_response(ai_message)
         
         try:
             evaluation_data = json.loads(ai_message)
@@ -505,10 +517,8 @@ def generate_poml_with_ai(idea_description):
 
         poml_message = response.json().get('choices', [{}])[0].get('message', {}).get('content', '').strip()
         
-        if poml_message.startswith('```json```'):
-            poml_message = poml_message.strip('```json```')
-        elif poml_message.startswith('```'):
-            poml_message = poml_message.strip('```').strip()
+        #Extract JSON
+        poml_message = extract_json_from_response(poml_message)
             
         return json.loads(poml_message)
     except requests.exceptions.RequestException as e:
@@ -713,4 +723,5 @@ def view_poml(idea_id):
     # Pretty-print POML data
     pretty_poml = json.dumps(idea['poml_data'], indent=2)
     
+
     return render_template('view_poml.html', idea=idea, pretty_poml=pretty_poml)
