@@ -58,7 +58,7 @@ This project is built with security and usability in mind, using SQLite for pers
 
 - **API Key**: Required for AI features. Obtain from [openrouter.ai](https://openrouter.ai). If missing, AI validation falls back to keyword-based checks.
 - **Database**: Path is absolute (`os.path.join(os.path.dirname(__file__), 'idea_evaluator.db')`) for reliability. For production scaling, consider migrating to PostgreSQL.
-- **Model**: Defaults to "x-ai/grok-4-fast:free" – customizable in `app.py` by modifying the `MODEL` variable.
+- **Model**: Defaults to "nvidia/nemotron-nano-9b-v2:free" – customizable in `app.py` by modifying the `MODEL` variable.
 
 Update `app.py` for custom configurations, such as changing the AI model or adding logging for debugging.
 
