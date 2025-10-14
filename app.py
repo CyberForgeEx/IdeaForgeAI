@@ -22,6 +22,8 @@ def get_db_connection():
     """Get database connection."""
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
+    # Ensure foreign key constraints are enforced in SQLite
+    conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
 def init_database():
@@ -79,10 +81,12 @@ OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY')
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 MODEL = "nvidia/nemotron-nano-9b-v2:free"
 
+# Build headers defensively so we don't send "Bearer None"
 HEADERS = {
-    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
     "Content-Type": "application/json"
 }
+if OPENROUTER_API_KEY:
+    HEADERS["Authorization"] = f"Bearer {OPENROUTER_API_KEY}"
 
 # Helper function to extract JSON
 def extract_json_from_response(text):
@@ -131,7 +135,7 @@ def validate_idea_content(title, description):
             return False, "Your description contains excessive repetition. Please provide a more detailed and varied description.", []
     
     # Check for minimal word count and variety
-    unique_words = set(word.lower().strip('.,!?;:"()[]{}') for word in words if len(word) > 3)
+    unique_words = set(word.lower().strip('.,!?;:\"()[]{}') for word in words if len(word) > 3)
     if len(unique_words) < 5:
         return False, "Your description lacks sufficient detail and variety. Please elaborate more on your idea.", []
     
@@ -365,10 +369,12 @@ def save_idea_evaluation(user_id, title, description, evaluation_data, poml_data
     if isinstance(evaluation_data, dict) and 'error' not in evaluation_data:
         for factor_name, factor_data in evaluation_data.items():
             if isinstance(factor_data, dict) and 'score' in factor_data:
+                # Ensure analysis field exists to satisfy NOT NULL constraint
+                analysis = factor_data.get('analysis', '')
                 conn.execute('''
                     INSERT INTO evaluation_factors (idea_id, factor_name, score, analysis)
                     VALUES (?, ?, ?, ?)
-                ''', (idea_id, factor_name, factor_data['score'], factor_data['analysis']))
+                ''', (idea_id, factor_name, factor_data['score'], analysis))
     
     conn.commit()
     conn.close()
@@ -382,18 +388,33 @@ def get_user_ideas(user_id, limit=None):
         WHERE user_id = ? 
         ORDER BY created_at DESC
     '''
-    if limit:
-        query += f' LIMIT {limit}'
+    params = [user_id]
+    if limit is not None:
+        # Safely handle limit - ensure it's an integer
+        try:
+            limit_val = int(limit)
+            query += ' LIMIT ?'
+            params.append(limit_val)
+        except (ValueError, TypeError):
+            # ignore invalid limit - don't add clause
+            pass
     
-    ideas = conn.execute(query, (user_id,)).fetchall()
+    ideas = conn.execute(query, tuple(params)).fetchall()
     
     # Convert to list of dictionaries and parse JSON fields
     ideas_list = []
     for idea in ideas:
         idea_dict = dict(idea)
-        idea_dict['evaluation_data'] = json.loads(idea_dict['evaluation_data'])
-        if idea_dict['poml_data']:
-            idea_dict['poml_data'] = json.loads(idea_dict['poml_data'])
+        # Guard against malformed JSON stored in DB
+        try:
+            idea_dict['evaluation_data'] = json.loads(idea_dict['evaluation_data'])
+        except (TypeError, json.JSONDecodeError):
+            idea_dict['evaluation_data'] = {"error": "invalid_or_corrupted_json"}
+        if idea_dict.get('poml_data'):
+            try:
+                idea_dict['poml_data'] = json.loads(idea_dict['poml_data'])
+            except (TypeError, json.JSONDecodeError):
+                idea_dict['poml_data'] = None
         ideas_list.append(idea_dict)
     
     conn.close()
@@ -409,9 +430,15 @@ def get_idea_by_id(idea_id, user_id):
     
     if idea:
         idea_dict = dict(idea)
-        idea_dict['evaluation_data'] = json.loads(idea_dict['evaluation_data'])
-        if idea_dict['poml_data']:
-            idea_dict['poml_data'] = json.loads(idea_dict['poml_data'])
+        try:
+            idea_dict['evaluation_data'] = json.loads(idea_dict['evaluation_data'])
+        except (TypeError, json.JSONDecodeError):
+            idea_dict['evaluation_data'] = {"error": "invalid_or_corrupted_json"}
+        if idea_dict.get('poml_data'):
+            try:
+                idea_dict['poml_data'] = json.loads(idea_dict['poml_data'])
+            except (TypeError, json.JSONDecodeError):
+                idea_dict['poml_data'] = None
         conn.close()
         return idea_dict
     
@@ -433,6 +460,9 @@ def delete_idea(idea_id, user_id):
 # AI Evaluation Functions
 def evaluate_idea_with_ai(idea_description):
     """Evaluate idea with AI."""
+    if not OPENROUTER_API_KEY:
+        return {"error": "API key not configured"}
+
     # output setting for AI generated data.
     system_prompt = (
         "You are a seasoned venture capitalist and technical advisor. Your task is to "
@@ -475,7 +505,7 @@ def evaluate_idea_with_ai(idea_description):
     }
 
     try:
-        response = requests.post(API_URL, headers=HEADERS, json=payload)
+        response = requests.post(API_URL, headers=HEADERS, json=payload, timeout=15)
         response.raise_for_status()
         response_data = response.json()
         ai_message = response_data['choices'][0]['message']['content'].strip()
@@ -494,6 +524,9 @@ def evaluate_idea_with_ai(idea_description):
 
 def generate_poml_with_ai(idea_description):
     """Generate POML with AI."""
+    if not OPENROUTER_API_KEY:
+        return {"error": "API key not configured"}
+
     poml_prompt = (
         "Generate a complete POML (Prompt Orchestration Markup Language) document "
         "for the following software project idea. The POML should define a logical "
@@ -509,7 +542,7 @@ def generate_poml_with_ai(idea_description):
     }
     
     try:
-        response = requests.post(API_URL, headers=HEADERS, json=payload)
+        response = requests.post(API_URL, headers=HEADERS, json=payload, timeout=15)
         response.raise_for_status()
         
         if not response.content:
