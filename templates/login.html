@@ -1,26 +1,57 @@
 <!-- login.html -->
 {% extends "base.html" %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Login - IDEAFORGE AI{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
+<div class="row justify-content-center" style="min-height: 70vh; align-items: center;">
+    <div class="col-md-6 col-lg-5">
+        <div class="text-center mb-4">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">
+                <i class="fas fa-lightbulb" style="background: linear-gradient(135deg, #9D4EDD, #C77DFF); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;"></i>
+            </div>
+            <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">Welcome Back</h1>
+            <p style="color: var(--text-secondary);">Sign in to continue your innovation journey</p>
+        </div>
+        
         <div class="card">
             <div class="card-body">
-                <h2 class="card-title text-center mb-4">Login</h2>
                 <form method="POST" action="{{ url_for('login') }}">
-                    <div class="mb-3">
+                    <div class="clay-input-group">
+                        <i class="fas fa-user input-icon"></i>
                         <label for="username" class="form-label">Username or Email</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        <input type="text" 
+                               class="form-control" 
+                               id="username" 
+                               name="username" 
+                               placeholder="Enter your username or email"
+                               required>
                     </div>
-                    <div class="mb-3">
+                    
+                    <div class="clay-input-group">
+                        <i class="fas fa-lock input-icon"></i>
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               name="password" 
+                               placeholder="Enter your password"
+                               required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                    </button>
                 </form>
-                <p class="text-center mt-3">Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
+                
+                <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                    <p style="color: var(--text-secondary); margin: 0;">
+                        Don't have an account? 
+                        <a href="{{ url_for('register') }}" style="color: var(--primary-purple); font-weight: 600; text-decoration: none;">
+                            Create one
+                        </a>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
