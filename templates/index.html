@@ -1,19 +1,77 @@
 <!-- index.html -->
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Home - IDEAFORGE AI{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8 text-center">
-        <h1 class="mb-4">Welcome to Idea Evaluator</h1>
-        <p class="lead">Evaluate your software project ideas with AI-powered insights.</p>
-        {% if not session.user_id %}
-        <a href="{{ url_for('login') }}" class="btn btn-primary me-2">Login</a>
-        <a href="{{ url_for('register') }}" class="btn btn-outline-primary">Register</a>
-        {% else %}
-        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
-        {% endif %}
+<div class="row justify-content-center" style="min-height: 70vh; align-items: center;">
+    <div class="col-lg-10">
+        <div class="text-center mb-5">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">
+                <i class="fas fa-lightbulb" style="background: linear-gradient(135deg, #9D4EDD, #C77DFF); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;"></i>
+            </div>
+            <h1 style="font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 1.5rem;">Welcome to IDEAFORGE AI</h1>
+            <p class="lead" style="font-size: 1.25rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2rem;">
+                Transform your software ideas into actionable insights with AI-powered evaluation and strategic analysis.
+            </p>
+            
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                {% if not session.user_id %}
+                <a href="{{ url_for('login') }}" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt me-2"></i>Get Started
+                </a>
+                <a href="{{ url_for('register') }}" class="btn btn-secondary">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </a>
+                {% else %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                    <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                </a>
+                <a href="{{ url_for('evaluate') }}" class="btn btn-secondary">
+                    <i class="fas fa-search me-2"></i>Evaluate New Idea
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Feature Cards -->
+        <div class="dashboard-grid mt-5">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">
+                        <i class="fas fa-brain" style="color: var(--primary-purple);"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">AI-Powered Analysis</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9375rem;">
+                        Leverage cutting-edge AI to evaluate feasibility, market potential, and technical complexity.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body text-center">
+                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">
+                        <i class="fas fa-chart-line" style="color: var(--primary-purple);"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Strategic Insights</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9375rem;">
+                        Get comprehensive breakdowns of strengths, risks, and opportunities for your project.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body text-center">
+                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">
+                        <i class="fas fa-rocket" style="color: var(--primary-purple);"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Fast Execution</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9375rem;">
+                        Receive detailed evaluations in seconds and start building with confidence.
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
