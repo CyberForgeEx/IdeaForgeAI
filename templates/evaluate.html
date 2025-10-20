@@ -1,23 +1,103 @@
 <!-- evaluate.html -->
 {% extends "base.html" %}
 
-{% block title %}Evaluate Idea{% endblock %}
+{% block title %}Evaluate Idea - IDEAFORGE AI{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Evaluate New Idea</h1>
-<div class="card">
-    <div class="card-body">
-        <form method="POST" action="{{ url_for('evaluate') }}">
-            <div class="mb-3">
-                <label for="title" class="form-label">Idea Title</label>
-                <input type="text" class="form-control" id="title" name="title" required>
+<div class="mb-5">
+    <h1 class="mb-2">Evaluate New Idea</h1>
+    <p style="color: var(--text-secondary); font-size: 1.0625rem;">
+        <i class="fas fa-magic me-2" style="color: var(--primary-purple);"></i>
+        Harness AI to analyze your software project's potential
+    </p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-lightbulb me-2"></i>Project Details
             </div>
-            <div class="mb-3">
-                <label for="idea_description" class="form-label">Idea Description</label>
-                <textarea class="form-control" id="idea_description" name="idea_description" rows="5" required></textarea>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('evaluate') }}">
+                    <div class="clay-input-group">
+                        <i class="fas fa-heading input-icon"></i>
+                        <label for="title" class="form-label">Idea Title</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="title" 
+                               name="title" 
+                               placeholder="e.g., AI-Powered Task Manager"
+                               required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="idea_description" class="form-label">
+                            <i class="fas fa-align-left me-2" style="color: var(--primary-purple);"></i>
+                            Idea Description
+                        </label>
+                        <textarea class="form-control" 
+                                  id="idea_description" 
+                                  name="idea_description" 
+                                  rows="8" 
+                                  placeholder="Describe your software idea in detail. Include the problem it solves, target audience, key features, and any unique value propositions..."
+                                  required></textarea>
+                        <small style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.5rem; display: block;">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Provide as much detail as possible for a comprehensive evaluation
+                        </small>
+                    </div>
+                    
+                    <div class="d-flex gap-3 flex-wrap">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sparkles me-2"></i>Evaluate with AI
+                        </button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </form>
             </div>
-            <button type="submit" class="btn btn-primary">Evaluate with AI</button>
-        </form>
+        </div>
+        
+        <!-- Info Cards -->
+        <div class="dashboard-grid mt-4">
+            <div class="card">
+                <div class="card-body">
+                    <div style="color: var(--primary-purple); font-size: 1.5rem; margin-bottom: 0.75rem;">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Comprehensive Scoring</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 0;">
+                        Get detailed scores across multiple evaluation factors
+                    </p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div style="color: var(--accent-glow); font-size: 1.5rem; margin-bottom: 0.75rem;">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">AI-Powered Insights</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 0;">
+                        Advanced analysis of feasibility and market potential
+                    </p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div style="color: var(--success); font-size: 1.5rem; margin-bottom: 0.75rem;">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Instant Results</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 0;">
+                        Receive your evaluation report in seconds
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
