@@ -1,0 +1,175 @@
+<!--New Compare feature-->
+{% extends "base.html" %}
+
+{% block title %}Compare Ideas - IDEAFORGE AI{% endblock %}
+
+{% block content %}
+<div class="mb-5">
+    <h1 class="mb-2">
+        <i class="fas fa-balance-scale me-3" style="color: var(--primary-purple);"></i>Idea Comparison
+    </h1>
+    <p style="color: var(--text-secondary);">
+        Side-by-side comparison of {{ ideas|length }} ideas
+    </p>
+</div>
+
+<!-- Comparison Table -->
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        <div class="table-responsive">
+            <table class="table table-dark" style="margin-bottom: 0;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--glass-border);">
+                        <th style="padding: 1.5rem; width: 200px; position: sticky; left: 0; background: var(--card-bg); z-index: 10;">
+                            <strong style="font-size: 1.125rem;">Criteria</strong>
+                        </th>
+                        {% for idea in ideas %}
+                        <th style="padding: 1.5rem; min-width: 250px; text-align: center;">
+                            <div style="margin-bottom: 0.75rem;">
+                                <strong style="color: var(--text-primary); font-size: 1.125rem;">{{ idea.title }}</strong>
+                            </div>
+                            <span class="score-badge" style="background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple)); color: white; padding: 0.5rem 1.25rem; border-radius: 20px; font-weight: 600;">
+                                {{ "%.1f"|format(idea.overall_score) }}/10
+                            </span>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Overall Score Row -->
+                    <tr style="border-bottom: 1px solid var(--border-color); background: rgba(157, 78, 221, 0.05);">
+                        <td style="padding: 1.25rem; font-weight: 600; position: sticky; left: 0; background: var(--card-bg);">
+                            <i class="fas fa-star me-2" style="color: var(--primary-purple);"></i>Overall Score
+                        </td>
+                        {% for idea in ideas %}
+                        <td style="padding: 1.25rem; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, #9D4EDD, #C77DFF); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                                {{ "%.1f"|format(idea.overall_score) }}
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    
+                    <!-- Factor Rows -->
+                    {% set factors = [
+                        ('innovation', 'Innovation', 'fas fa-lightbulb'),
+                        ('market_demand', 'Market Demand', 'fas fa-users'),
+                        ('feasibility', 'Feasibility', 'fas fa-wrench'),
+                        ('scalability', 'Scalability', 'fas fa-expand-arrows-alt'),
+                        ('monetization_potential', 'Monetization', 'fas fa-dollar-sign'),
+                        ('team_resource_availability', 'Resources', 'fas fa-people-carry'),
+                        ('time_to_market', 'Time to Market', 'fas fa-clock'),
+                        ('future_trends', 'Future Trends', 'fas fa-rocket')
+                    ] %}
+                    
+                    {% for factor_key, factor_name, icon in factors %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 1.25rem; position: sticky; left: 0; background: var(--card-bg);">
+                            <i class="{{ icon }} me-2" style="color: var(--primary-purple);"></i>{{ factor_name }}
+                        </td>
+                        {% for idea in ideas %}
+                        {% if factor_key in idea.evaluation_data and 'score' in idea.evaluation_data[factor_key] %}
+                        {% set score = idea.evaluation_data[factor_key].score %}
+                        <td style="padding: 1.25rem; text-align: center;">
+                            <div class="mb-2">
+                                <span style="font-size: 1.5rem; font-weight: 600; color: var(--primary-purple);">
+                                    {{ score }}
+                                </span>
+                                <span style="color: var(--text-muted);">/10</span>
+                            </div>
+                            <div style="background: var(--glass-bg); height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid var(--glass-border); max-width: 150px; margin: 0 auto;">
+                                <div style="height: 100%; background: linear-gradient(90deg, var(--primary-purple), var(--secondary-purple)); width: {{ (score/10*100)|int }}%;"></div>
+                            </div>
+                        </td>
+                        {% else %}
+                        <td style="padding: 1.25rem; text-align: center; color: var(--text-muted);">
+                            N/A
+                        </td>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    
+                    <!-- Created Date Row -->
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 1.25rem; position: sticky; left: 0; background: var(--card-bg);">
+                            <i class="fas fa-calendar me-2" style="color: var(--primary-purple);"></i>Created
+                        </td>
+                        {% for idea in ideas %}
+                        <td style="padding: 1.25rem; text-align: center; color: var(--text-secondary);">
+                            {{ idea.created_at | format_datetime('date') }}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    
+                    <!-- Actions Row -->
+                    <tr style="background: rgba(157, 78, 221, 0.05);">
+                        <td style="padding: 1.5rem; font-weight: 600; position: sticky; left: 0; background: var(--card-bg);">
+                            <i class="fas fa-cog me-2" style="color: var(--primary-purple);"></i>Actions
+                        </td>
+                        {% for idea in ideas %}
+                        <td style="padding: 1.5rem; text-align: center;">
+                            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                <a href="{{ url_for('view_idea', idea_id=idea.id) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-eye me-1"></i>View
+                                </a>
+                                {% if idea.poml_data %}
+                                <a href="{{ url_for('view_poml', idea_id=idea.id) }}" class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-file-code me-1"></i>POML
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Winner Card -->
+{% set winner = ideas|max(attribute='overall_score') %}
+<div class="card mt-4" style="border: 2px solid var(--primary-purple); background: linear-gradient(135deg, rgba(157, 78, 221, 0.1), rgba(199, 125, 255, 0.05));">
+    <div class="card-body text-center">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">
+            <i class="fas fa-trophy" style="color: #FFD700;"></i>
+        </div>
+        <h2 style="margin-bottom: 1rem;">
+            <span style="color: var(--text-muted); font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 0.5rem;">Highest Scoring</span>
+            {{ winner.title }}
+        </h2>
+        <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem;">
+            <span style="background: linear-gradient(135deg, #9D4EDD, #C77DFF); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                {{ "%.1f"|format(winner.overall_score) }}/10
+            </span>
+        </div>
+        <a href="{{ url_for('view_idea', idea_id=winner.id) }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-eye me-2"></i>View Winner Details
+        </a>
+    </div>
+</div>
+
+<!-- Back Button -->
+<div class="mt-4">
+    <a href="{{ url_for('my_ideas') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to All Ideas
+    </a>
+</div>
+
+<style>
+    /* Sticky column styling */
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    @media (max-width: 768px) {
+        .table th:first-child,
+        .table td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+        }
+    }
+</style>
+{% endblock %}
