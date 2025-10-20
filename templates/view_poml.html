@@ -1,88 +1,160 @@
 {% extends "base.html" %}
 
-{% block title %}POML for Idea: {{ idea.title }}{% endblock %}
+{% block title %}POML - {{ idea.title }} - IDEAFORGE AI{% endblock %}
 
 {% block content %}
-<!-- Tailwind CSS CDN for styling (include only if not in base.html) -->
-<script src="https://cdn.tailwindcss.com"></script>
 <style>
-    /* Custom styles for the modal and textarea */
-    .modal {
+    .poml-modal {
         display: none;
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(11, 8, 20, 0.9);
+        backdrop-filter: blur(10px);
         justify-content: center;
         align-items: center;
-        z-index: 1000;
+        z-index: 2000;
     }
-    .modal-content {
-        background-color: white;
-        color: black;
-        padding: 20px;
-        border-radius: 8px;
-        max-width: 500px;
+    .poml-modal-content {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        padding: 2rem;
+        border-radius: 16px;
+        max-width: 600px;
         width: 90%;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: var(--shadow-glow);
     }
     textarea#poml-content {
-        background-color: #f6f8fa;
-        color: black;
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
-        padding: 10px;
-        font-family: monospace;
-        resize: none; /* Prevent manual resizing, rely on CSS */
+        background: rgba(21, 15, 33, 0.8);
+        color: var(--text-primary);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 1.25rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        resize: vertical;
         width: 100%;
-        min-height: 300px;
+        min-height: 400px;
+        max-height: 60vh;
         overflow-y: auto;
     }
-    @media (max-width: 640px) {
-        textarea#poml-content {
-            min-height: 200px;
-        }
+    textarea#poml-content:focus {
+        outline: none;
+        border-color: var(--primary-purple);
+        box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.15);
     }
 </style>
 
-<div class="container mx-auto p-4">
-    <h1 class="text-3xl font-bold mb-4">POML for Idea: {{ idea.title }}</h1>
-    
-    <div class="mb-4">
-        <a href="{{ url_for('view_idea', idea_id=idea.id) }}" class="text-blue-600 hover:underline">Back to Idea</a>
-        | <a href="{{ url_for('dashboard') }}" class="text-blue-600 hover:underline">Back to Dashboard</a>
-    </div>
-
-    {% if pretty_poml %}
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-2xl font-semibold mb-2 text-black bg-white">POML Data</h2>
-            <textarea id="poml-content" readonly>{{ pretty_poml }}</textarea>
-            <button id="copy-btn" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none">
-                Copy POML to Clipboard
-            </button>
-        </div>
-    {% else %}
-        <p class="text-red-600">No POML data available for this idea.</p>
-    {% endif %}
+<!-- Header -->
+<div class="mb-5">
+    <h1 class="mb-2">POML Data</h1>
+    <p style="color: var(--text-secondary); font-size: 1.0625rem;">
+        <i class="fas fa-file-code me-2" style="color: var(--primary-purple);"></i>
+        Prompt Orchestration Markup Language for: <strong>{{ idea.title }}</strong>
+    </p>
 </div>
 
-<!-- Modal for copy confirmation and instructions -->
-<div id="copy-modal" class="modal">
-    <div class="modal-content">
-        <h3 class="text-xl font-bold mb-2">POML Copied Successfully!</h3>
-        <p class="mb-4">The POML data has been copied to your clipboard.</p>
-        <h4 class="text-lg font-semibold mb-2">How to Use POML</h4>
-        <ul class="list-disc pl-5 mb-4">
-            <li>POML (Prompt Orchestration Markup Language) is a JSON-based format that defines a logical flow for building your software application using AI-driven prompts.</li>
-            <li><strong>Parse the JSON</strong>: Use the copied JSON in a prompt orchestration system or development tool that supports structured workflows.</li>
-            <li><strong>Use the Prompts</strong>: The POML includes example prompts for key tasks (e.g., code generation, testing). Feed these prompts to an AI model like Grok or another API.</li>
-            <li><strong>Integrate with Tools</strong>: Import the POML into tools that support AI-driven development to automate tasks or generate code.</li>
-            <li><strong>Validate the Structure</strong>: Ensure the JSON is valid and compatible with your target system before use.</li>
-            <li><strong>Example Workflow</strong>: Load the POML into a script or platform, execute the prompts in sequence, and review the outputs for your project.</li>
-        </ul>
-        <button id="close-modal" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 focus:outline-none">Close</button>
+<!-- Navigation -->
+<div class="mb-4 d-flex gap-3 flex-wrap">
+    <a href="{{ url_for('view_idea', idea_id=idea.id) }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Idea
+    </a>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+    </a>
+</div>
+
+<!-- POML Content Card -->
+{% if pretty_poml %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-code me-2"></i>POML Code</span>
+        <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">JSON Format</span>
+    </div>
+    <div class="card-body">
+        <textarea id="poml-content" readonly>{{ pretty_poml }}</textarea>
+        <button id="copy-btn" class="btn btn-primary mt-3">
+            <i class="fas fa-copy me-2"></i>Copy to Clipboard
+        </button>
+    </div>
+</div>
+
+<!-- Info Card -->
+<div class="card mt-4">
+    <div class="card-header">
+        <i class="fas fa-info-circle me-2"></i>About POML
+    </div>
+    <div class="card-body">
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+            POML (Prompt Orchestration Markup Language) is a structured JSON format that defines workflows for AI-driven application development.
+        </p>
+        <div class="dashboard-grid">
+            <div style="padding: 1rem; background: var(--glass-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+                <div style="color: var(--primary-purple); font-size: 1.25rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <strong style="color: var(--text-primary); font-size: 0.9375rem;">Structured Workflow</strong>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.5rem 0 0;">Logical flow for building applications</p>
+            </div>
+            <div style="padding: 1rem; background: var(--glass-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+                <div style="color: var(--accent-glow); font-size: 1.25rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <strong style="color: var(--text-primary); font-size: 0.9375rem;">AI-Driven Prompts</strong>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.5rem 0 0;">Feed to AI models for code generation</p>
+            </div>
+            <div style="padding: 1rem; background: var(--glass-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+                <div style="color: var(--success); font-size: 1.25rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-plug"></i>
+                </div>
+                <strong style="color: var(--text-primary); font-size: 0.9375rem;">Tool Integration</strong>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.5rem 0 0;">Compatible with orchestration systems</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center" style="padding: 3rem;">
+        <div style="font-size: 3rem; color: var(--danger); margin-bottom: 1rem;">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h2 style="margin-bottom: 1rem;">No POML Data</h2>
+        <p style="color: var(--text-secondary);">POML data is not available for this idea.</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- Success Modal -->
+<div id="copy-modal" class="poml-modal">
+    <div class="poml-modal-content">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div style="font-size: 3rem; color: var(--success); margin-bottom: 1rem;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 style="color: var(--text-primary); margin-bottom: 0.5rem;">POML Copied!</h2>
+            <p style="color: var(--text-secondary);">The POML data has been copied to your clipboard.</p>
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <h3 style="color: var(--text-primary); font-size: 1.125rem; margin-bottom: 1rem;">
+                <i class="fas fa-graduation-cap me-2" style="color: var(--primary-purple);"></i>How to Use
+            </h3>
+            <ul style="color: var(--text-secondary); font-size: 0.9375rem; line-height: 1.8; list-style-position: inside;">
+                <li style="margin-bottom: 0.5rem;"><strong>Parse the JSON:</strong> Use in prompt orchestration systems</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Feed to AI:</strong> Execute prompts with AI models like GPT or Grok</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Integrate Tools:</strong> Import into AI-driven development platforms</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Validate Structure:</strong> Ensure JSON compatibility with your system</li>
+            </ul>
+        </div>
+        
+        <button id="close-modal" class="btn btn-primary w-100">
+            <i class="fas fa-check me-2"></i>Got it
+        </button>
     </div>
 </div>
 
