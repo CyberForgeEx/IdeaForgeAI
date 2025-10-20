@@ -1,34 +1,79 @@
 <!-- register.html -->
 {% extends "base.html" %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Register - IDEAFORGE AI{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
+<div class="row justify-content-center" style="min-height: 70vh; align-items: center;">
+    <div class="col-md-6 col-lg-5">
+        <div class="text-center mb-4">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">
+                <i class="fas fa-lightbulb" style="background: linear-gradient(135deg, #9D4EDD, #C77DFF); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;"></i>
+            </div>
+            <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">Create Account</h1>
+            <p style="color: var(--text-secondary);">Join IDEAFORGE and start evaluating your ideas</p>
+        </div>
+        
         <div class="card">
             <div class="card-body">
-                <h2 class="card-title text-center mb-4">Register</h2>
                 <form method="POST" action="{{ url_for('register') }}">
-                    <div class="mb-3">
+                    <div class="clay-input-group">
+                        <i class="fas fa-user input-icon"></i>
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        <input type="text" 
+                               class="form-control" 
+                               id="username" 
+                               name="username" 
+                               placeholder="Choose a username"
+                               required>
                     </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
+                    
+                    <div class="clay-input-group">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="email" 
+                               name="email" 
+                               placeholder="your@email.com"
+                               required>
                     </div>
-                    <div class="mb-3">
+                    
+                    <div class="clay-input-group">
+                        <i class="fas fa-lock input-icon"></i>
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               name="password" 
+                               placeholder="Create a strong password"
+                               required>
                     </div>
-                    <div class="mb-3">
+                    
+                    <div class="clay-input-group">
+                        <i class="fas fa-check-circle input-icon"></i>
                         <label for="confirm_password" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        <input type="password" 
+                               class="form-control" 
+                               id="confirm_password" 
+                               name="confirm_password" 
+                               placeholder="Re-enter your password"
+                               required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </button>
                 </form>
-                <p class="text-center mt-3">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+                
+                <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                    <p style="color: var(--text-secondary); margin: 0;">
+                        Already have an account? 
+                        <a href="{{ url_for('login') }}" style="color: var(--primary-purple); font-weight: 600; text-decoration: none;">
+                            Sign in
+                        </a>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
