@@ -19,7 +19,7 @@
 ## Project Overview
 IdeaForge is a web-based application designed to help entrepreneurs, developers, and innovators evaluate software project ideas using AI-driven analysis. Users can submit ideas, which are validated for legitimacy as software projects, evaluated across key metrics (e.g., innovation, market demand, feasibility), and optionally generate a Prompt Orchestration Markup Language (POML) document for further development guidance.
 
-The app includes user authentication, a dashboard with advanced analytics, and integration with AI models via the OpenRouter API. It ensures ideas are focused on software/technology by employing both keyword-based and AI-powered validation to filter out non-relevant submissions. The updated UI features a professional, mobile-responsive design with claymorphic styling and a modern color scheme.
+The  web app includes user authentication, a dashboard with advanced analytics, and integration with AI models via the Groq API. It ensures ideas are focused on software/technology by employing both keyword-based and AI-powered validation to filter out non-relevant submissions. The updated UI features a professional, mobile-responsive design with claymorphic styling and a modern color scheme.
 
 This project is built with security, usability, and scalability in mind, using SQLite for persistent storage and Flask as the web framework. It is suitable for personal use, startups, or educational purposes.
 
@@ -41,7 +41,7 @@ This project is built with security, usability, and scalability in mind, using S
 - **Backend**: Flask (Python web framework)
 - **Database**: SQLite (lightweight, file-based RDBMS)
 - **Security**: Werkzeug (for password hashing)
-- **AI Integration**: OpenRouter API (for validation, evaluation, and POML generation)
+- **AI Integration**: Groq API (for validation, evaluation, and POML generation)
 - **HTTP Requests**: Requests library
 - **Environment Management**: python-dotenv (for loading `.env` files)
 - **Frontend**: Jinja2 templates (HTML/CSS/JS with claymorphic styling and mobile responsiveness)
@@ -51,12 +51,12 @@ This project is built with security, usability, and scalability in mind, using S
 - Python 3.10 or higher
 - pip (Python package installer)
 - Virtual environment tool (e.g., venv)
-- OpenRouter API account (for AI features) – sign up at [openrouter.ai](https://openrouter.ai)
+- Groq API account (for AI features) – sign up at [console.groq.com](https://console.groq.com)
 
 ## Configuration
-- **API Key**: Required for AI features. Obtain from [openrouter.ai](https://openrouter.ai). If missing, AI validation falls back to keyword-based checks.
+- **API Key**: Required for AI features. Obtain Free API-key from [console.groq.com](https://console.groq.com).
 - **Database**: Path is absolute (`os.path.join(os.path.dirname(__file__), 'idea_evaluator.db')`) for reliability. For production scaling, consider migrating to PostgreSQL.
-- **Model**: Defaults to "nvidia/nemotron-nano-9b-v2:free" – customizable in `app.py` by modifying the `MODEL` variable.
+- **Model**: Defaults to "llama-3.3-70b-versatile" customizable in `app.py` by modifying the `GROQ_MODEL` variable.
 - **Timezone**: Configured for UTC+4 with Jinja2 filters for local time display.
 
 Update `app.py` for custom configurations, such as changing the AI model, timezone, or adding logging for debugging.
@@ -90,16 +90,16 @@ Access at `http://127.0.0.1:5000/`.
   - Foreign key constraints and cascading deletes ensure data integrity.
 
 ## AI Integration
-- **Validation**: Combines rule-based checks (keywords, regex patterns for non-software ideas) and AI validation via OpenRouter to ensure ideas are software-related.
+- **Validation**: Combines rule-based checks (keywords, regex patterns for non-software ideas) and AI validation via Groq to ensure ideas are software-related.
 - **Evaluation**: Scores ideas on eight factors (0-10): innovation, market demand, feasibility, scalability, monetization potential, team/resource availability, time to market, and future trends.
 - **POML Generation**: Produces a JSON-based POML document with tech stacks and development prompts, authored as "IDEAFORGE".
 - **Error Handling**: Gracefully handles API failures by falling back to keyword validation or returning user-friendly error messages.
 
-Ensure your OpenRouter API key has sufficient credits for continuous usage.
+Ensure your Groq API key has sufficient credits for continuous usage.
 
 ## Acknowledgements
 - [Flask](https://flask.palletsprojects.com/) for the lightweight web framework.
-- [OpenRouter](https://openrouter.ai/) for AI API integration.
+- [Groq](https://groq.com/) for AI API integration.
 - [Python](https://www.python.org/) community for robust libraries.
 
 Thank you for using IdeaForge! 🚀
