@@ -141,13 +141,14 @@ def init_database():
 # Initialize database on module load
 init_database()
 
-# API Configuration
-OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY')
-API_URL = "https://openrouter.ai/api/v1/chat/completions"
-MODEL = "nvidia/nemotron-nano-9b-v2:free"
+# Groq API Configuration
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-HEADERS = {
-    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+GROQ_MODEL = "llama-3.3-70b-versatile"
+
+GROQ_HEADERS = {
+    "Authorization": f"Bearer {GROQ_API_KEY}",
     "Content-Type": "application/json"
 }
 
@@ -290,12 +291,11 @@ def validate_idea_with_ai(title, description):
     Use AI to validate if the idea is a legitimate software project.
     Returns dict with is_valid, reason, and suggestions.
     """
-    if not OPENROUTER_API_KEY:
+    if not GROQ_API_KEY:
         # If no API key, skip AI validation and rely on keyword-based validation
         return {'is_valid': True, 'reason': '', 'suggestions': []}
 
-    validation_prompt = """
-You are a software project validator. Analyze the given title and description to determine if this is a legitimate software/technology project idea.
+    validation_prompt = f"""You are a software project validator. Analyze the given title and description to determine if this is a legitimate software/technology project idea.
 
 Rules for validation:
 1. Must be related to software, apps, websites, platforms, or technology solutions
@@ -316,16 +316,16 @@ Description: {description}
 """
 
     payload = {
-        "model": MODEL,
+        "model": GROQ_MODEL,
         "messages": [
-            {"role": "user", "content": validation_prompt.format(title=title, description=description)}
+            {"role": "user", "content": validation_prompt}
         ],
         "max_tokens": 300,
         "temperature": 0.1
     }
 
     try:
-        response = requests.post(API_URL, headers=HEADERS, json=payload, timeout=10)
+        response = requests.post(GROQ_API_URL, headers=GROQ_HEADERS, json=payload, timeout=15)
         response.raise_for_status()
         response_data = response.json()
         ai_message = response_data['choices'][0]['message']['content'].strip()
@@ -618,50 +618,52 @@ def compare_ideas(user_id, idea_ids):
     conn.close()
     return ideas_list
 
-# AI Evaluation Functions
+# AI Evaluation Functions with Groq
 def evaluate_idea_with_ai(idea_description):
-    """Evaluate idea with AI."""
-    system_prompt = (
-        "You are a seasoned venture capitalist and technical advisor. Your task is to "
-        "evaluate a software project idea based on a set of criteria. Provide a score "
-        "from 0 to 10 for each factor and a brief analysis. The output MUST be a single, "
-        "valid JSON object with the following structure:\n\n"
-        "{{\n"
-        '  "innovation": {{"score": int, "analysis": "string"}},\n'
-        '  "market_demand": {{"score": int, "analysis": "string"}},\n'
-        '  "feasibility": {{"score": int, "analysis": "string"}},\n'
-        '  "scalability": {{"score": int, "analysis": "string"}},\n'
-        '  "monetization_potential": {{"score": int, "analysis": "string"}},\n'
-        '  "team_resource_availability": {{"score": int, "analysis": "string"}},\n'
-        '  "time_to_market": {{"score": int, "analysis": "string"}},\n'
-        '  "future_trends": {{"score": int, "analysis": "string"}}\n'
-        "}}"
-    )
+    """Evaluate idea with Groq AI."""
+    system_prompt = """You are a seasoned venture capitalist and technical advisor. Your task is to evaluate a software project idea based on a set of criteria. Provide a score from 0 to 10 for each factor and a brief analysis. 
 
-    user_prompt = (
-        "Please evaluate the following software project idea:\n\n"
-        f"Project Idea: {idea_description}\n\n"
-        "Please provide a score from 0-10 and a brief analysis for each of the following factors:\n"
-        "- **Innovation**: How unique or novel is the idea?\n"
-        "- **Market Demand**: Is there an existing market for the idea?\n"
-        "- **Feasibility**: Is the idea technically feasible with current technology?\n"
-        "- **Scalability**: Can the project grow and scale over time?\n"
-        "- **Monetization Potential**: How easy is it to monetize the project?\n"
-        "- **Team/Resource Availability**: Does the project require a rare skill set?\n"
-        "- **Time to Market**: How long will it take to build a working prototype?\n"
-        "- **Future Trends**: Is the idea aligned with future tech trends like AI, Web 3.0, Blockchain etc.?"
-    )
+The output MUST be a single, valid JSON object with the following structure:
+
+{
+  "innovation": {"score": int, "analysis": "string"},
+  "market_demand": {"score": int, "analysis": "string"},
+  "feasibility": {"score": int, "analysis": "string"},
+  "scalability": {"score": int, "analysis": "string"},
+  "monetization_potential": {"score": int, "analysis": "string"},
+  "team_resource_availability": {"score": int, "analysis": "string"},
+  "time_to_market": {"score": int, "analysis": "string"},
+  "future_trends": {"score": int, "analysis": "string"}
+}
+
+Respond ONLY with the JSON object, no additional text."""
+
+    user_prompt = f"""Please evaluate the following software project idea:
+
+Project Idea: {idea_description}
+
+Please provide a score from 0-10 and a brief analysis for each of the following factors:
+- **Innovation**: How unique or novel is the idea?
+- **Market Demand**: Is there an existing market for the idea?
+- **Feasibility**: Is the idea technically feasible with current technology?
+- **Scalability**: Can the project grow and scale over time?
+- **Monetization Potential**: How easy is it to monetize the project?
+- **Team/Resource Availability**: Does the project require a rare skill set?
+- **Time to Market**: How long will it take to build a working prototype?
+- **Future Trends**: Is the idea aligned with future tech trends like AI, Web 3.0, Blockchain etc.?"""
 
     payload = {
-        "model": MODEL,
+        "model": GROQ_MODEL,
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
-        ]
+        ],
+        "temperature": 0.3,
+        "max_tokens": 2500
     }
 
     try:
-        response = requests.post(API_URL, headers=HEADERS, json=payload)
+        response = requests.post(GROQ_API_URL, headers=GROQ_HEADERS, json=payload, timeout=30)
         response.raise_for_status()
         response_data = response.json()
         ai_message = response_data['choices'][0]['message']['content'].strip()
@@ -679,23 +681,26 @@ def evaluate_idea_with_ai(idea_description):
         return {"error": f"API request failed: {str(e)}"}
 
 def generate_poml_with_ai(idea_description):
-    """Generate POML with AI."""
-    poml_prompt = (
-        "Generate a complete POML (Prompt Orchestration Markup Language) document "
-        "for the following software project idea. The POML should define a logical "
-        "flow for building the application with suitable tech stacks, including a few example prompts for key "
-        "tasks. The output MUST be a valid, single JSON object representing the entire POML, and in the POML metadata name the author as IDEAFORGE and remove date."
-    )
+    """Generate POML with Groq AI."""
+    poml_prompt = f"""Generate a complete POML (Prompt Orchestration Markup Language) document for the following software project idea. The POML should define a logical flow for building the application with suitable tech stacks, including a few example prompts for key tasks.
+
+Project Idea: {idea_description}
+
+The output MUST be a valid, single JSON object representing the entire POML. In the POML metadata, name the author as IDEAFORGE and remove the date field.
+
+Respond ONLY with the JSON object, no additional text or markdown."""
 
     payload = {
-        "model": MODEL,
+        "model": GROQ_MODEL,
         "messages": [
-            {"role": "user", "content": poml_prompt + f"\n\nProject Idea: {idea_description}\n\n"}
-        ]
+            {"role": "user", "content": poml_prompt}
+        ],
+        "temperature": 0.5,
+        "max_tokens": 4500
     }
 
     try:
-        response = requests.post(API_URL, headers=HEADERS, json=payload)
+        response = requests.post(GROQ_API_URL, headers=GROQ_HEADERS, json=payload, timeout=30)
         response.raise_for_status()
 
         if not response.content:
@@ -837,8 +842,8 @@ def evaluate():
                                  suggestions=suggestions)
 
         # Check API configuration
-        if not OPENROUTER_API_KEY:
-            flash('API key not configured. Please contact administrator.', 'error')
+        if not GROQ_API_KEY:
+            flash('Groq API key not configured. Please contact administrator.', 'error')
             return render_template('evaluate.html')
 
         # Get evaluation from AI
