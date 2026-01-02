@@ -79,6 +79,7 @@ Access at `http://127.0.0.1:5000/`.
 6. **Add/View Comments**: Add, view, or delete comments on ideas for collaboration.
 7. **Compare Ideas**: Select up to 4 ideas for side-by-side comparison of scores and factors.
 8. **View POML**: If generated, view the POML document at `/poml/<id>`.
+9. **POML USAGE**: Use the provided [prompt](https://github.com/CyberForgeEx/IdeaForgeAI/blob/main/Prompt) on the Agent based MVP creation plafoams and give the created JSON payload to make your first MVP. (Ex: [EMERGENT](https://app.emergent.sh/home)) 
 
 ## Database Management
 - **Schema**:
